@@ -1,0 +1,75 @@
+%Firstly we calibrate the camera with some checkerboard sample images
+%cameraCalibr();
+img = imread('calib/calib/16L.png');
+[imagePoints, boardSize, imagesUsed] = detectCheckerboardPoints(img);
+img2 = img;
+imagePoints = round(imagePoints)
+d = size(imagePoints);
+for x = 1:d(1)
+     i = imagePoints(x,1);
+     j = imagePoints(x,2);
+     img2 = dilateDots(img2,j,i);    
+end
+%calculating the distance of the dots and getting the coords of the centre
+%of the single square 
+fx = cameraParams.FocalLength(1);
+fy = cameraParams.FocalLength(2);
+%here we calculate 3D coordinates of individual chess fields
+[xyz,centers] = calculateCoordinates(imagePoints,fx,fy);
+d = size(centers);
+centers = int64(centers);
+img3 = img2+img;
+for i = 1:d(2)
+    for j = 1:d(3)
+        k=centers(2,i,j);
+        l=centers(1,i,j);
+        img3 =dilateDotsGreen(img3,k,l);
+    end
+end
+%here we are trying to find centers of the chessboard for a graphical
+%representation
+board = imread('chess_board.jpg');
+[imagePoints, boardSize, imagesUsed] = detectCheckerboardPoints(board);
+imagePoints = round(imagePoints)
+[~,centers] = calculateCoordinates(imagePoints,fx,fy);
+%initialization of the chessboard 
+Init = ["BR","BK","BB","BQ","BKi","BB","BK","BR";
+         "BP","BP","BP","BP","BP","BP","BP","BP";
+         "-","-","-","-","-","-","-","-";
+        "-","-","-","-","-","-","-","-";
+        "-","-","-","-","-","-","-","-";
+        "-","-","-","-","-","-","-","-";
+        "WP","WP","WP","WP","WP","WP","WP","WP";
+        "WR","WK","WB","WQ","WKi","WB","WK","WR"];
+boardCurrent = showBoardCurrent(Init,board);
+imshow(boardCurrent);
+%After we have initialized the board settings now we can start playing 
+OVER = 0;
+Board = ["1","-","-","-","-","-","-","-","-";
+         "2","-","-","-","-","-","-","-","-";
+         "3","-","-","-","-","-","-","-","-";
+        "4","-","-","-","-","-","-","-","-";
+        "5","-","-","-","-","-","-","-","-";
+        "6","-","-","-","-","-","-","-","-";
+        "7","-","-","-","-","-","-","-","-";
+        "8","H","G","F","E","D","C","B","A"];
+while (OVER==0)
+    %Here we will wait for the input from the microphone, processed it will
+    %result in a series of words combined into one string 
+    
+    %for the practical purposes, as speech processing has not yet been
+    %developed it will be imported manually
+    Board
+    command = input('command: ','s');
+    keywords = split(command);
+    if(keywords == "end")
+        OVER = 1;
+    end
+    if (keywords ~= "end")
+        [XY1,XY2]=recognizeCommand(keywords)
+    end
+    %we execute the move
+    Init(XY1(1))
+
+
+end

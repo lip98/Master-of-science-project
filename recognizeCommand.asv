@@ -1,0 +1,11 @@
+function coords =recognizeCommand(keywords)
+    startingCoord =keywords(1);
+    endingCoord = keywords(2);
+    XY1 = [0,0];
+    XY2 = [0,0];
+    letter1 = startingCoord(1);
+    number1 = startingCoord(2);
+    letter2 = endingCoord(1);
+    number2 = endingCoord(2);
+    
+end
